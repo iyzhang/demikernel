@@ -107,12 +107,23 @@ target_link_libraries(dmtr-dpdk-catnip-server dmtr-libos-dpdk-catnip yaml-cpp bo
 add_executable(dmtr-dpdk-catnip-client  ${TCP_ECHO_CLIENT_SOURCES})
 target_link_libraries(dmtr-dpdk-catnip-client dmtr-libos-dpdk-catnip yaml-cpp boost_program_options)
 
+# DPDK+catnip UDP server
+add_executable(dmtr-dpdk-catnip-udp-server ${UDP_ECHO_SERVER_SOURCES})
+target_link_libraries(dmtr-dpdk-catnip-udp-server dmtr-libos-dpdk-catnip yaml-ccp boost_program_options)
+
+# DPDK+catnip UDP client
+add_executable(dmtr-dpdk-catnip-udp-client ${UDP_ECHO_CLIENT_SOURCES})
+target_link_libraries(dmtr-dpdk-catnip-udp-client dmtr-libos-dpdk-catnip yaml-ccp boost_program_options)
+
 # DPDK+catnip TCP client & server
 add_custom_target(dmtr-dpdk-catnip-echo)
 add_dependencies(dmtr-dpdk-catnip-echo dmtr-dpdk-catnip-server dmtr-dpdk-catnip-client)
+
+# DPDK+catnip UDP client & server
+add_custom_target(dmtr-dpdk-catnip-udp-echo)
+add_dependencies(dmtr-dpdk-catnip-udp-echo dmtr-dpdk-catnip-udp-server dmtr-dpdk-catnip-udp-client)
 
 # POSIX & SPDK storage test clients
 # POSIX TCP client & server
 add_custom_target(dmtr-echo-store)
 add_dependencies(dmtr-echo-store  dmtr-posix-echo dmtr-spdk-rdma-echo dmtr-spdk-lwip-echo posix-echo)
-
