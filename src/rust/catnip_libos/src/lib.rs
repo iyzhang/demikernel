@@ -208,7 +208,7 @@ pub extern "C" fn dmtr_bind(qd: c_int, saddr: *const sockaddr, size: socklen_t) 
     }
     let saddr_in = unsafe { *mem::transmute::<*const sockaddr, *const libc::sockaddr_in>(saddr) };
     let mut addr = Ipv4Addr::from(u32::from_be_bytes(saddr_in.sin_addr.s_addr.to_le_bytes()));
-    let port = ip::Port::try_from(saddr_in.sin_port).unwrap();
+    let port = ip::Port::try_from(u16::from_be(saddr_in.sin_port)).unwrap();
 
     with_libos(|libos| {
         if addr.is_unspecified() {
@@ -261,7 +261,7 @@ pub extern "C" fn dmtr_connect(
     }
     let saddr_in = unsafe { *mem::transmute::<*const sockaddr, *const libc::sockaddr_in>(saddr) };
     let addr = Ipv4Addr::from(u32::from_be_bytes(saddr_in.sin_addr.s_addr.to_le_bytes()));
-    let port = ip::Port::try_from(saddr_in.sin_port).unwrap();
+    let port = ip::Port::try_from(u16::from_be(saddr_in.sin_port)).unwrap();
     let endpoint = ipv4::Endpoint::new(addr, port);
 
     with_libos(|libos| {
@@ -318,7 +318,7 @@ pub extern "C" fn dmtr_pushto(
     }
     let saddr_in = unsafe { *mem::transmute::<*const sockaddr, *const libc::sockaddr_in>(saddr) };
     let addr = Ipv4Addr::from(u32::from_be_bytes(saddr_in.sin_addr.s_addr.to_le_bytes()));
-    let port = ip::Port::try_from(saddr_in.sin_port).unwrap();
+    let port = ip::Port::try_from(u16::from_be(saddr_in.sin_port)).unwrap();
     let endpoint = ipv4::Endpoint::new(addr, port);
     with_libos(|libos| {
         unsafe { *qtok_out = libos.pushto(qd as FileDescriptor, sga, endpoint) };
