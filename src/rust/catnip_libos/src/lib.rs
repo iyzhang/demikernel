@@ -145,6 +145,12 @@ pub extern "C" fn dmtr_init(argc: c_int, argv: *mut *mut c_char) -> c_int {
             }
             println!("Pre-populating ARP table: {:?}", arp_table);
         }
+
+        let mut disable_arp = false;
+        if let Some(arp_disabled) = config_obj["catnip"]["disable_arp"].as_bool() {
+            disable_arp = arp_disabled;
+            println!("ARP disabled: {:?}", disable_arp);
+        }
         
         let eal_init_args = match config_obj["dpdk"]["eal_init"] {
             Yaml::Array(ref arr) => arr
@@ -158,7 +164,7 @@ pub extern "C" fn dmtr_init(argc: c_int, argv: *mut *mut c_char) -> c_int {
             _ => Err(format_err!("Malformed YAML config"))?,
         };
 
-        let runtime = self::dpdk::initialize_dpdk(local_ipv4_addr, &eal_init_args, arp_table)?;
+        let runtime = self::dpdk::initialize_dpdk(local_ipv4_addr, &eal_init_args, arp_table, disable_arp)?;
         logging::initialize();
         LibOS::new(runtime)?
     };

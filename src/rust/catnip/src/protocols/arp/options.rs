@@ -15,6 +15,7 @@ pub struct ArpOptions {
     pub retry_count: usize,
 
     pub initial_values: HashMap<MacAddress, Ipv4Addr>,
+    pub disable_arp: bool,
 }
 
 impl Default for ArpOptions {
@@ -24,6 +25,7 @@ impl Default for ArpOptions {
             request_timeout: Duration::from_secs(20),
             retry_count: 5,
             initial_values: HashMap::new(),
+            disable_arp: false,
         }
     }
 }

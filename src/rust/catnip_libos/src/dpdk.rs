@@ -67,6 +67,7 @@ pub fn initialize_dpdk(
     local_ipv4_addr: Ipv4Addr,
     eal_init_args: &[CString],
     arp_table: HashMap<MacAddress, Ipv4Addr>,
+    disable_arp: bool,
 ) -> Result<DPDKRuntime, Error> {
     std::env::set_var("MLX5_SHUT_UP_BF", "1");
     let eal_init_refs = eal_init_args
@@ -135,6 +136,7 @@ pub fn initialize_dpdk(
         port_id,
         mbuf_pool,
         arp_table,
+        disable_arp,
     ))
 }
 

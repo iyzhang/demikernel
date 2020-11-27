@@ -27,7 +27,6 @@ use crate::{
     },
 };
 use futures::{
-    task::noop_waker_ref,
     FutureExt,
 };
 use rand::{
@@ -45,7 +44,6 @@ use std::{
     future::Future,
     net::Ipv4Addr,
     rc::Rc,
-    task::Context,
     time::{
         Duration,
         Instant,

@@ -11,6 +11,9 @@ server:
     port: 12345
 catnip:
   my_ipv4_addr: 192.168.1.1
+  arp_table:
+    "24:8a:07:50:95:08": 192.168.1.1
+  disable_arp: true
 dpdk:
 #  eal_init: ["-l", "0-3", "-n", "1", "-w", "aa89:00:02.0", "--vdev=net_vdev_netvsc0,iface=eth1"]
   eal_init: ["-c", "0xff", "-n", "4", "-w", "03:00.1","--proc-type=auto"]

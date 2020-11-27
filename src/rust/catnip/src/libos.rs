@@ -17,11 +17,9 @@ use crate::{
     },
     sync::BytesMut,
 };
-use futures::task::noop_waker_ref;
 use libc::c_int;
 use std::{
     slice,
-    task::Context,
     time::Instant,
 };
 use tracy_client::static_span;

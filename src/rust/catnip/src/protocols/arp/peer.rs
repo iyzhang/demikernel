@@ -46,7 +46,7 @@ pub struct ArpPeer<RT: Runtime> {
 impl<RT: Runtime> ArpPeer<RT> {
     pub fn new(now: Instant, rt: RT) -> Result<ArpPeer<RT>, Fail> {
         let options = rt.arp_options();
-        let cache = Rc::new(RefCell::new(ArpCache::new(now, Some(options.cache_ttl))));
+        let cache = Rc::new(RefCell::new(ArpCache::new(now, Some(options.cache_ttl), options.disable_arp)));
         let handle = rt.spawn(Self::background(rt.clone(), cache.clone()));
         let peer = ArpPeer {
             rt,

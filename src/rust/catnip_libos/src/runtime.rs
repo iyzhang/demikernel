@@ -96,6 +96,7 @@ impl DPDKRuntime {
         dpdk_port_id: u16,
         dpdk_mempool: *mut rte_mempool,
         arp_table: HashMap<MacAddress, Ipv4Addr>,
+        disable_arp: bool,
     ) -> Self {
         let mut rng = rand::thread_rng();
         let rng = SmallRng::from_rng(&mut rng).expect("Failed to initialize RNG");
@@ -111,6 +112,7 @@ impl DPDKRuntime {
         }
         let mut arp_options = arp::Options::default();
         arp_options.initial_values = arp_table;
+        arp_options.disable_arp = disable_arp;
         let inner = Inner {
             timer: TimerRc(Rc::new(Timer::new(now))),
             link_addr,

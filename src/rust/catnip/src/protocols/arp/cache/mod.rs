@@ -28,6 +28,8 @@ use std::{
     },
 };
 
+const DUMMY_MAC_ADDRESS: MacAddress = MacAddress::new([0; 6]);
+
 #[derive(Debug, Clone)]
 struct Record {
     link_addr: MacAddress,
@@ -41,14 +43,16 @@ pub struct ArpCache {
     // TODO: Allow multiple waiters for the same address
     // TODO: Deregister waiters here when the receiver goes away.
     waiters: HashMap<Ipv4Addr, Sender<MacAddress>>,
+    arp_disabled: bool,
 }
 
 impl ArpCache {
-    pub fn new(now: Instant, default_ttl: Option<Duration>) -> ArpCache {
+    pub fn new(now: Instant, default_ttl: Option<Duration>, arp_disabled: bool) -> ArpCache {
         ArpCache {
             cache: HashTtlCache::new(now, default_ttl),
             rmap: HashMap::default(),
             waiters: HashMap::default(),
+            arp_disabled,
         }
     }
 
@@ -99,6 +103,9 @@ impl ArpCache {
     }
 
     pub fn get_link_addr(&self, ipv4_addr: Ipv4Addr) -> Option<&MacAddress> {
+        if self.arp_disabled {
+            return Some(&DUMMY_MAC_ADDRESS);
+        }
         let result = self.cache.get(&ipv4_addr).map(|r| &r.link_addr);
         debug!("`{:?}` -> `{:?}`", ipv4_addr, result);
         result
@@ -106,7 +113,9 @@ impl ArpCache {
 
     pub fn wait_link_addr(&mut self, ipv4_addr: Ipv4Addr) -> impl Future<Output = MacAddress> {
         let (tx, rx) = channel();
-        if let Some(r) = self.cache.get(&ipv4_addr) {
+        if self.arp_disabled {
+            let _ = tx.send(DUMMY_MAC_ADDRESS);
+        } else if let Some(r) = self.cache.get(&ipv4_addr) {
             let _ = tx.send(r.link_addr);
         } else {
             assert!(self.waiters.insert(ipv4_addr, tx).is_none());
@@ -115,6 +124,7 @@ impl ArpCache {
     }
 
     pub fn get_ipv4_addr(&self, link_addr: MacAddress) -> Option<&Ipv4Addr> {
+        assert_ne!(link_addr, DUMMY_MAC_ADDRESS);
         self.rmap.get(&link_addr)
     }
 

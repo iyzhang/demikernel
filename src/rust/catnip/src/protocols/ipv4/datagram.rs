@@ -1,7 +1,6 @@
 use crate::{
     fail::Fail,
     sync::Bytes,
-    protocols::ethernet2::frame::{MIN_PAYLOAD_SIZE, ETHERNET2_HEADER2_SIZE},
 };
 use byteorder::{
     ByteOrder,
