@@ -12,6 +12,8 @@ fn main() {
         .header("wrapper.h")
         .generate_inline_functions(true)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .blacklist_type("rte_arp_ipv4")
+        .blacklist_type("rte_arp_hdr")
         .generate()
         .expect("Failed to generate bindings");
 
