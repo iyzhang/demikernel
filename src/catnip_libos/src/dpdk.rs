@@ -95,10 +95,10 @@ pub fn initialize_dpdk(
     if nb_ports == 0 {
         bail!("No ethernet ports available");
     }
-    eprintln!(
-        "DPDK reports that {} ports (interfaces) are available.",
-        nb_ports
-    );
+//    eprintln!(
+//        "DPDK reports that {} ports (interfaces) are available.",
+//        nb_ports
+//    );
 
     let mut memory_config = MemoryConfig::default();
     if use_jumbo_frames {
@@ -269,10 +269,10 @@ fn initialize_dpdk_port(
                 } else {
                     "half"
                 };
-                eprintln!(
-                    "Port {} Link Up - speed {} Mbps - {} duplex",
-                    port_id, link.link_speed, duplex
-                );
+//                eprintln!(
+//                    "Port {} Link Up - speed {} Mbps - {} duplex",
+//                    port_id, link.link_speed, duplex
+//                );
                 break;
             }
             rte_delay_us_block(sleep_duration.as_micros() as u32);

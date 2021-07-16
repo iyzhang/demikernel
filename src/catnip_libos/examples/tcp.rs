@@ -54,26 +54,18 @@ impl Latency {
     }
 
     pub fn print(self) {
-        println!("{} histogram", self.name);
         let mut h = Histogram::configure().precision(4).build().unwrap();
 
         // Drop the first 10% of samples.
         for s in &self.samples[(self.samples.len() / 10)..] {
             h.increment(s.as_nanos() as u64).unwrap();
         }
-        print_histogram(&h);
+        println!(
+            "rtt {}: {:?}",
+            self.name,
+            Duration::from_nanos(h.percentile(0.50).unwrap())
+        );
     }
-}
-
-pub fn print_histogram(h: &Histogram) {
-    println!(
-        "p50:   {:?}",
-        Duration::from_nanos(h.percentile(0.50).unwrap())
-    );
-    println!(
-        "p99:   {:?}",
-        Duration::from_nanos(h.percentile(0.99).unwrap())
-    );
 }
 
 pub struct Stats {
@@ -87,7 +79,7 @@ impl Stats {
     }
 }
 
-pub fn run(niters: usize, mut f: impl FnMut(&mut Stats)) {
+pub fn run(niters: usize, label: &'static str, mut f: impl FnMut(&mut Stats)) {
     let throughput_gbps = |num_bytes: usize, duration: Duration| {
         let bps = (num_bytes as f64) / duration.as_secs_f64();
         bps / 1024. / 1024. / 1024. * 8.
@@ -96,7 +88,7 @@ pub fn run(niters: usize, mut f: impl FnMut(&mut Stats)) {
         start: Instant::now(),
         num_bytes: 0,
     };
-    let mut latency = Latency::new("round", niters);
+    let mut latency = Latency::new(label, niters);
     for _ in 0..niters {
         let _s = latency.record();
         f(&mut stats);
@@ -262,7 +254,7 @@ fn main() -> Result<(), Error> {
             let pop = Latency::new("pop", niters);
             (Some(push), Some(pop))
         };
-        run(niters, |stats| {
+        run(niters, "server", |stats| {
             let mut bytes_received = 0;
             while bytes_received < config.buffer_size {
                 let r = pop.as_mut().map(|p| p.record());
@@ -296,7 +288,7 @@ fn main() -> Result<(), Error> {
         let bufs = config.body_buffers(libos.rt(), 'a');
         let mut push_tokens = Vec::with_capacity(bufs.len());
 
-        run(niters, |stats| {
+        run(niters, "client", |stats| {
             assert!(push_tokens.is_empty());
             for b in &bufs {
                 let qtoken = libos.push2(sockfd, b.clone()).unwrap();

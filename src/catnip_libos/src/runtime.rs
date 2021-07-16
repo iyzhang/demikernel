@@ -157,7 +157,7 @@ struct Inner {
     ipv4_addr: Ipv4Addr,
     rng: SmallRng,
     arp_options: arp::Options,
-    tcp_options: tcp::Options,
+    tcp_options: tcp::Options<DPDKRuntime>,
     udp_options: udp::Options,
 
     dpdk_port_id: u16,
@@ -311,7 +311,7 @@ impl Runtime for DPDKRuntime {
         self.inner.borrow().ipv4_addr.clone()
     }
 
-    fn tcp_options(&self) -> tcp::Options {
+    fn tcp_options(&self) -> tcp::Options<Self> {
         self.inner.borrow().tcp_options.clone()
     }
 
